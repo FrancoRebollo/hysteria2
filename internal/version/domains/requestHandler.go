@@ -110,3 +110,21 @@ type Generate2FAQR struct {
 type Generate2FAQRDos struct {
 	Username string `json:"username"`
 }
+
+// ----------------------------------------------- //
+
+type RequestAltaBoss struct {
+	IdBosses    int    `json:"id_bosses"`
+	Nombre      string `json:"nombre"`
+	RespawnTime int    `json:"respawn_time"`
+
+	IntervalRespawnTime       int    `json:"interval_respawn_time"`
+	UnidadIntervalRespawnTime string `json:"unidad_interval_respawn_time"`
+	Lunes                     string `json:"lunes"`
+	Martes                    string `json:"martes"`
+	Miercoles                 string `json:"miercoles"`
+	Jueves                    string `json:"jueves"`
+	Viernes                   string `json:"viernes"`
+	Sabado                    string `json:"sabado"`
+	Domingo                   string `json:"domingo"`
+}

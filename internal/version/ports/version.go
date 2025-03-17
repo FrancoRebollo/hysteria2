@@ -56,3 +56,11 @@ type SecurityRepository interface {
 	Generate2FAQR(ctx context.Context, generate2FAQR domains.Generate2FAQR) (string, error)
 	CheckApiKeyExpirada(ctx context.Context, apiKey string) (bool, error)
 }
+
+type HysteriaService interface {
+	AltaBossAPI(ctx context.Context, AltaBoss domains.RequestAltaBoss) error
+}
+
+type HysteriaRepository interface {
+	AltaBoss(ctx context.Context, AltaBoss domains.RequestAltaBoss) (string, error)
+}

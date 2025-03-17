@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	apis "plantilla_api/cmd/apis/handlers"
+	"plantilla_api/cmd/apis/handlers/hysteria"
 	"plantilla_api/cmd/apis/handlers/seguridad"
 	"plantilla_api/cmd/utils/constants"
 
@@ -18,7 +19,7 @@ type Router struct {
 	*gin.Engine
 }
 
-func NewRouter(config *config.HTTP, securityHandler seguridad.SecurityHandler) (*Router, error) {
+func NewRouter(config *config.HTTP, securityHandler seguridad.SecurityHandler, hysteriaHandler hysteria.HysteriaHandler) (*Router, error) {
 	//Debug mode
 	if config.Environment == constants.PRODUCCION {
 		gin.SetMode(gin.ReleaseMode)
@@ -74,6 +75,12 @@ func NewRouter(config *config.HTTP, securityHandler seguridad.SecurityHandler) (
 			config.POST("/creacion_canales_digitales", securityHandler.CrearCanalDigital)
 
 		}
+
+		hysteria := api.Group("/hysteria")
+		{
+			hysteria.POST("/altaBoss", hysteriaHandler.AltaBoss)
+		}
+
 	}
 
 	return &Router{

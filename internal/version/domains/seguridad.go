@@ -82,3 +82,9 @@ type QRBase64UrlResponse struct {
 	CodeBase64 string `json:"code_base_64"`
 	ManualSeed string `json:"manual_seed"`
 }
+
+type AltaBossResponse struct {
+	IdBosses int    `json:"id_bosses"`
+	Nombre   string `json:"nombre"`
+	Message  string `json:"message"`
+}

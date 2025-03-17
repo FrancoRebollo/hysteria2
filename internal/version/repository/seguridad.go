@@ -28,7 +28,7 @@ func (v SecurityRepository) AltaUser(ctx context.Context, altaUser domains.Reque
 			tx.Rollback()
 		}
 	}()
-	query := `SELECT TIPO_CANAL_DIGITAL FROM TS_SEC.TIPO_CANAL_DIGITAL_DF WHERE TIPO_CANAL_DIGITAL = $1`
+	query := `SELECT TIPO_CANAL_DIGITAL FROM hysteria.TIPO_CANAL_DIGITAL_DF WHERE TIPO_CANAL_DIGITAL = $1`
 
 	rows, err := tx.QueryContext(ctx, query, altaUser.CanalDigital)
 
@@ -41,7 +41,7 @@ func (v SecurityRepository) AltaUser(ctx context.Context, altaUser domains.Reque
 	}
 	rows.Close()
 
-	query = `SELECT id_persona FROM TS_SEC.persona WHERE id_persona = $1`
+	query = `SELECT id_persona FROM hysteria.persona WHERE id_persona = $1`
 
 	rows, err = tx.QueryContext(ctx, query, fmt.Sprint(altaUser.IdPersona))
 
@@ -50,7 +50,7 @@ func (v SecurityRepository) AltaUser(ctx context.Context, altaUser domains.Reque
 	}
 
 	if !rows.Next() {
-		insert := "INSERT INTO TS_SEC.PERSONA (ID_PERSONA,LAST_LOCATION) VALUES ($1,0)"
+		insert := "INSERT INTO hysteria.PERSONA (ID_PERSONA,LAST_LOCATION) VALUES ($1,0)"
 
 		_, err = tx.ExecContext(ctx, insert, fmt.Sprint(altaUser.IdPersona))
 
@@ -63,7 +63,7 @@ func (v SecurityRepository) AltaUser(ctx context.Context, altaUser domains.Reque
 
 	rows.Close()
 
-	query = `SELECT id_canal_digital_persona FROM TS_SEC.canal_digital_persona WHERE id_persona = $1 and tipo_canal_digital = $2`
+	query = `SELECT id_canal_digital_persona FROM hysteria.canal_digital_persona WHERE id_persona = $1 and tipo_canal_digital = $2`
 
 	rows, err = tx.QueryContext(ctx, query, fmt.Sprint(altaUser.IdPersona), altaUser.CanalDigital)
 
@@ -74,7 +74,7 @@ func (v SecurityRepository) AltaUser(ctx context.Context, altaUser domains.Reque
 	if !rows.Next() {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(altaUser.Password), bcrypt.DefaultCost)
 
-		insert := `INSERT INTO TS_SEC.CANAL_DIGITAL_PERSONA 
+		insert := `INSERT INTO hysteria.CANAL_DIGITAL_PERSONA 
 		(ID_PERSONA,TIPO_CANAL_DIGITAL,PASSWORD_ACCESO_HASH,id_mail_persona,id_te_persona,LOGIN_NAME) VALUES ($1,$2,$3,$4,$5,$6)`
 
 		_, err = tx.ExecContext(ctx, insert, altaUser.IdPersona, altaUser.CanalDigital, hashedPassword, altaUser.IdMailPersona,
@@ -96,7 +96,7 @@ func (v SecurityRepository) AltaUser(ctx context.Context, altaUser domains.Reque
 
 func (v SecurityRepository) checkCredentials(ctx context.Context, credentials domains.Credentials) error {
 
-	query := `SELECT id_persona FROM TS_SEC.persona WHERE id_persona = $1`
+	query := `SELECT id_persona FROM hysteria.persona WHERE id_persona = $1`
 
 	rows, err := v.dbPost.GetDB().QueryContext(ctx, query, credentials.IdPersona)
 
@@ -109,7 +109,7 @@ func (v SecurityRepository) checkCredentials(ctx context.Context, credentials do
 	}
 	rows.Close()
 
-	query = `SELECT tipo_canal_digital FROM TS_SEC.tipo_canal_digital_df WHERE tipo_canal_digital = $1`
+	query = `SELECT tipo_canal_digital FROM hysteria.tipo_canal_digital_df WHERE tipo_canal_digital = $1`
 
 	rows, err = v.dbPost.GetDB().QueryContext(ctx, query, credentials.CanalDigital)
 
@@ -122,7 +122,7 @@ func (v SecurityRepository) checkCredentials(ctx context.Context, credentials do
 	}
 	rows.Close()
 
-	query = `SELECT id_canal_digital_persona FROM TS_SEC.canal_digital_persona WHERE tipo_canal_digital = $1
+	query = `SELECT id_canal_digital_persona FROM hysteria.canal_digital_persona WHERE tipo_canal_digital = $1
 		and id_persona = $2 and canal_validado = 'N'`
 
 	rows, err = v.dbPost.GetDB().QueryContext(ctx, query, credentials.CanalDigital, credentials.IdPersona)
@@ -136,7 +136,7 @@ func (v SecurityRepository) checkCredentials(ctx context.Context, credentials do
 	}
 	rows.Close()
 
-	query = `SELECT api_key FROM TS_SEC.api_key WHERE api_key = $1`
+	query = `SELECT api_key FROM hysteria.api_key WHERE api_key = $1`
 
 	rows, err = v.dbPost.GetDB().QueryContext(ctx, query, credentials.ApiKey)
 
@@ -154,7 +154,7 @@ func (v SecurityRepository) checkCredentials(ctx context.Context, credentials do
 
 func (v SecurityRepository) checkRevokes(ctx context.Context, credentials domains.Credentials) error {
 
-	query := `SELECT id_persona FROM TS_SEC.persona WHERE id_persona = $1 and acceso_revocado = 'S'`
+	query := `SELECT id_persona FROM hysteria.persona WHERE id_persona = $1 and acceso_revocado = 'S'`
 
 	rows, err := v.dbPost.GetDB().QueryContext(ctx, query, credentials.IdPersona)
 
@@ -167,7 +167,7 @@ func (v SecurityRepository) checkRevokes(ctx context.Context, credentials domain
 	}
 	rows.Close()
 
-	query = `SELECT tipo_canal_digital FROM TS_SEC.tipo_canal_digital_df WHERE tipo_canal_digital = $1 and acceso_revocado = 'S'`
+	query = `SELECT tipo_canal_digital FROM hysteria.tipo_canal_digital_df WHERE tipo_canal_digital = $1 and acceso_revocado = 'S'`
 
 	rows, err = v.dbPost.GetDB().QueryContext(ctx, query, credentials.CanalDigital)
 
@@ -180,7 +180,7 @@ func (v SecurityRepository) checkRevokes(ctx context.Context, credentials domain
 	}
 	rows.Close()
 
-	query = `SELECT id_canal_digital_persona FROM TS_SEC.canal_digital_persona WHERE tipo_canal_digital = $1
+	query = `SELECT id_canal_digital_persona FROM hysteria.canal_digital_persona WHERE tipo_canal_digital = $1
 		and id_persona = $2 and canal_validado = 'N' and acceso_revocado = 'S'`
 
 	rows, err = v.dbPost.GetDB().QueryContext(ctx, query, credentials.CanalDigital, credentials.IdPersona)
@@ -194,7 +194,7 @@ func (v SecurityRepository) checkRevokes(ctx context.Context, credentials domain
 	}
 	rows.Close()
 
-	query = `SELECT api_key FROM TS_SEC.api_key WHERE api_key = $1 and fecha_fin_vigencia < current_date`
+	query = `SELECT api_key FROM hysteria.api_key WHERE api_key = $1 and fecha_fin_vigencia < current_date`
 
 	rows, err = v.dbPost.GetDB().QueryContext(ctx, query, credentials.ApiKey)
 
@@ -220,8 +220,8 @@ func (v SecurityRepository) CheckTokenCreation(ctx context.Context, credentials 
 		return err
 	}
 
-	query := `SELECT id_token,fecha_exp_refresh_token FROM TS_SEC.TOKEN
-		WHERE ID_CANAL_DIGITAL_PERSONA = (SELECT ID_CANAL_DIGITAL_PERSONA FROM TS_SEC.CANAL_DIGITAL_PERSONA
+	query := `SELECT id_token,fecha_exp_refresh_token FROM hysteria.TOKEN
+		WHERE ID_CANAL_DIGITAL_PERSONA = (SELECT ID_CANAL_DIGITAL_PERSONA FROM hysteria.CANAL_DIGITAL_PERSONA
 											WHERE ID_PERSONA = $1 AND TIPO_CANAL_DIGITAL = $2)
 		and api_key = $3`
 
@@ -251,7 +251,7 @@ func (v SecurityRepository) updateAccessToken(ctx context.Context, credentialsTo
 
 	accessExpiresAt := time.Now().Add(time.Minute * time.Duration(accesTokenDuration))
 
-	query := `SELECT id_token FROM TS_SEC.TOKEN	WHERE ID_CANAL_DIGITAL_PERSONA = $1 AND API_KEY = $2`
+	query := `SELECT id_token FROM hysteria.TOKEN	WHERE ID_CANAL_DIGITAL_PERSONA = $1 AND API_KEY = $2`
 
 	_ = v.dbPost.GetDB().QueryRowContext(ctx, query, idCanalDigitalPersona, credentialsToken.ApiKey).Scan(&idToken)
 
@@ -260,9 +260,9 @@ func (v SecurityRepository) updateAccessToken(ctx context.Context, credentialsTo
 	}
 
 	insert := `
-    INSERT INTO ts_sec.hist_token (id_token, api_key, id_canal_digital_persona, access_token, fecha_creacion_token, fecha_exp_access_token, refresh_token, fecha_exp_refresh_token, acceso_revocado)
+    INSERT INTO hysteria.hist_token (id_token, api_key, id_canal_digital_persona, access_token, fecha_creacion_token, fecha_exp_access_token, refresh_token, fecha_exp_refresh_token, acceso_revocado)
     SELECT id_token, api_key, id_canal_digital_persona, access_token, fecha_creacion_token, fecha_exp_access_token, refresh_token, fecha_exp_refresh_token, acceso_revocado
-    FROM ts_sec.token
+    FROM hysteria.token
     WHERE id_token = $1`
 
 	_, err = v.dbPost.GetDB().ExecContext(ctx, insert, idToken)
@@ -271,7 +271,7 @@ func (v SecurityRepository) updateAccessToken(ctx context.Context, credentialsTo
 		return err
 	}
 
-	update := `update TS_SEC.token set access_token = $1, fecha_exp_access_token = $2 
+	update := `update hysteria.token set access_token = $1, fecha_exp_access_token = $2 
 		where id_token = $3`
 
 	_, err = v.dbPost.GetDB().ExecContext(ctx, update, credentialsToken.AccessToken, accessExpiresAt, idToken)
@@ -284,7 +284,7 @@ func (v SecurityRepository) updateAccessToken(ctx context.Context, credentialsTo
 }
 
 func (v SecurityRepository) PersistToken(ctx context.Context, credentials domains.CredentialsToken) error {
-	query := `SELECT ID_CANAL_DIGITAL_PERSONA FROM TS_SEC.CANAL_DIGITAL_PERSONA WHERE ID_PERSONA = $1 
+	query := `SELECT ID_CANAL_DIGITAL_PERSONA FROM hysteria.CANAL_DIGITAL_PERSONA WHERE ID_PERSONA = $1 
 		AND TIPO_CANAL_DIGITAL = $2`
 
 	var idCanalDigitalPersona int
@@ -308,8 +308,8 @@ func (v SecurityRepository) PersistToken(ctx context.Context, credentials domain
 func (v SecurityRepository) tokenExpiration(ctx context.Context, credentials domains.Credentials) error {
 	var idToken int
 	var fechaExpAccessToken time.Time
-	query := `SELECT id_token,fecha_exp_access_token FROM TS_SEC.TOKEN
-		WHERE ID_CANAL_DIGITAL_PERSONA = (SELECT ID_CANAL_DIGITAL_PERSONA FROM TS_SEC.CANAL_DIGITAL_PERSONA
+	query := `SELECT id_token,fecha_exp_access_token FROM hysteria.TOKEN
+		WHERE ID_CANAL_DIGITAL_PERSONA = (SELECT ID_CANAL_DIGITAL_PERSONA FROM hysteria.CANAL_DIGITAL_PERSONA
 											WHERE ID_PERSONA = $1 AND TIPO_CANAL_DIGITAL = $2)
 		and api_key = $3
 		`
@@ -348,7 +348,7 @@ func (v SecurityRepository) MiddlewareValidations(ctx context.Context, credentia
 
 func (v SecurityRepository) RevokePersona(ctx context.Context, revokePersona domains.RequestRevokePer) error {
 
-	update := `update TS_SEC.persona set acceso_revocado = $1 where id_persona = $2`
+	update := `update hysteria.persona set acceso_revocado = $1 where id_persona = $2`
 
 	_, err := v.dbPost.GetDB().ExecContext(ctx, update, revokePersona.Revoke, revokePersona.IdPersonaRevoke)
 
@@ -360,7 +360,7 @@ func (v SecurityRepository) RevokePersona(ctx context.Context, revokePersona dom
 }
 
 func (v SecurityRepository) RevokeCanalDigital(ctx context.Context, revokeCanalDigital domains.RequestRevokeCanalDigital) error {
-	update := `update TS_SEC.tipo_canal_digital_df set acceso_revocado = $1 where tipo_canal_digital = $2`
+	update := `update hysteria.tipo_canal_digital_df set acceso_revocado = $1 where tipo_canal_digital = $2`
 
 	_, err := v.dbPost.GetDB().ExecContext(ctx, update, revokeCanalDigital.Revoke, revokeCanalDigital.CanalDigitalRevoke)
 
@@ -372,7 +372,7 @@ func (v SecurityRepository) RevokeCanalDigital(ctx context.Context, revokeCanalD
 }
 
 func (v SecurityRepository) RevokeCanalDigPer(ctx context.Context, revokeCanalDigPer domains.RequestRevokeCanalDigPer) error {
-	update := `update TS_SEC.canal_digital_persona set acceso_revocado = $1 where tipo_canal_digital = $2 
+	update := `update hysteria.canal_digital_persona set acceso_revocado = $1 where tipo_canal_digital = $2 
 		and id_persona = $3`
 
 	_, err := v.dbPost.GetDB().ExecContext(ctx, update, revokeCanalDigPer.Revoke, revokeCanalDigPer.CanalDigitalRevoke, revokeCanalDigPer.IdPersonaRevoke)
@@ -401,7 +401,7 @@ func (v SecurityRepository) LoginValidations(ctx context.Context, requestLogin d
 		}
 	}()
 
-	query := `select id_persona,password_acceso_hash from ts_sec.canal_digital_persona where tipo_canal_digital = $1 
+	query := `select id_persona,password_acceso_hash from hysteria.canal_digital_persona where tipo_canal_digital = $1 
 		and login_name = $2`
 
 	err = tx.QueryRowContext(ctx, query, requestLogin.CanalDigital, requestLogin.Username).Scan(&idPersona, &hashedPassword)
@@ -472,7 +472,7 @@ func (v SecurityRepository) UpsertAccessToken(ctx context.Context, requestUpsert
 		}
 	}()
 
-	query := `SELECT ID_CANAL_DIGITAL_PERSONA FROM TS_SEC.CANAL_DIGITAL_PERSONA
+	query := `SELECT ID_CANAL_DIGITAL_PERSONA FROM hysteria.CANAL_DIGITAL_PERSONA
 		WHERE ID_PERSONA = $1 AND TIPO_CANAL_DIGITAL = $2`
 
 	err = tx.QueryRowContext(ctx, query, requestUpsert.IdPersona, requestUpsert.CanalDigital).Scan(&idCanalDigitalPersona)
@@ -481,7 +481,7 @@ func (v SecurityRepository) UpsertAccessToken(ctx context.Context, requestUpsert
 		return err
 	}
 
-	query = `SELECT id_token FROM TS_SEC.TOKEN WHERE ID_CANAL_DIGITAL_PERSONA = $1 AND API_KEY = $2`
+	query = `SELECT id_token FROM hysteria.TOKEN WHERE ID_CANAL_DIGITAL_PERSONA = $1 AND API_KEY = $2`
 
 	rows, err := tx.QueryContext(ctx, query, idCanalDigitalPersona, requestUpsert.ApiKey)
 
@@ -491,7 +491,7 @@ func (v SecurityRepository) UpsertAccessToken(ctx context.Context, requestUpsert
 
 	if !rows.Next() {
 
-		insert := `INSERT INTO TS_SEC.token 
+		insert := `INSERT INTO hysteria.token 
 		(api_key,id_canal_digital_persona,access_token,fecha_exp_access_token,refresh_token,fecha_Exp_refresh_token) VALUES ($1,$2,$3,$4,$5,$6)`
 
 		_, err = tx.ExecContext(ctx, insert, requestUpsert.ApiKey, idCanalDigitalPersona, requestUpsert.AccessToken,
@@ -510,9 +510,9 @@ func (v SecurityRepository) UpsertAccessToken(ctx context.Context, requestUpsert
 	rows.Close()
 
 	insert := `
-    INSERT INTO ts_sec.hist_token (id_token, api_key, id_canal_digital_persona, access_token, fecha_creacion_token, fecha_exp_access_token, refresh_token, fecha_exp_refresh_token, acceso_revocado)
+    INSERT INTO hysteria.hist_token (id_token, api_key, id_canal_digital_persona, access_token, fecha_creacion_token, fecha_exp_access_token, refresh_token, fecha_exp_refresh_token, acceso_revocado)
     SELECT id_token, api_key, id_canal_digital_persona, access_token, fecha_creacion_token, fecha_exp_access_token, refresh_token, fecha_exp_refresh_token, acceso_revocado
-    FROM ts_sec.token
+    FROM hysteria.token
     WHERE id_canal_digital_persona = $1
 	and api_key = $2`
 
@@ -522,7 +522,7 @@ func (v SecurityRepository) UpsertAccessToken(ctx context.Context, requestUpsert
 		return err
 	}
 
-	update := `update TS_SEC.token	set access_token = $1, fecha_creacion_token = $2, fecha_exp_access_token = $3, refresh_token = $4
+	update := `update hysteria.token	set access_token = $1, fecha_creacion_token = $2, fecha_exp_access_token = $3, refresh_token = $4
 		,fecha_exp_refresh_token = $5 
 		where id_canal_digital_persona = $6 
 		and api_key = $7`
@@ -545,10 +545,10 @@ func (v SecurityRepository) LogProcedure(ctx context.Context, logStruct *domains
 	var idToken int
 	logStruct.MssgError = mssgError
 
-	query := `SELECT id_token FROM TS_SEC.token
+	query := `SELECT id_token FROM hysteria.token
 		WHERE api_key = $1 
 		AND id_canal_digital_persona = (select id_canal_digital_persona 
-											from ts_sec.canal_digital_persona
+											from hysteria.canal_digital_persona
 											where id_persona = $2
 											and tipo_canal_digital = $3)`
 
@@ -560,7 +560,7 @@ func (v SecurityRepository) LogProcedure(ctx context.Context, logStruct *domains
 
 	logStruct.IdToken = idToken
 
-	insert := `INSERT INTO ts_sec.error_log (message_error, id_TIPO_ERROR, ID_PERSONA, canal_digital, api_key, id_token, access_token
+	insert := `INSERT INTO hysteria.error_log (message_error, id_TIPO_ERROR, ID_PERSONA, canal_digital, api_key, id_token, access_token
 		, ip_address, endpoint)
 		values ($1,$2,$3,$4,$5,$6,$7,$8,$9)`
 
@@ -576,11 +576,11 @@ func (v SecurityRepository) LogProcedure(ctx context.Context, logStruct *domains
 
 func (v SecurityRepository) UpdCode2FA(ctx context.Context, login domains.RequestLogin, code int) error {
 
-	update := `update TS_SEC.token
+	update := `update hysteria.token
 		set last_code_2fa = $1
 		WHERE api_key = $2
 		AND id_canal_digital_persona = (select id_canal_digital_persona 
-											from ts_sec.canal_digital_persona
+											from hysteria.canal_digital_persona
 											where login_name = $3
 											and tipo_canal_digital = $4)`
 
@@ -597,10 +597,10 @@ func (v SecurityRepository) CheckLastRefreshToken(ctx context.Context, token str
 
 	var idToken int
 
-	query := `SELECT id_token FROM TS_SEC.token
+	query := `SELECT id_token FROM hysteria.token
 		WHERE api_key = $1 
 		AND id_canal_digital_persona = (select id_canal_digital_persona 
-											from ts_sec.canal_digital_persona
+											from hysteria.canal_digital_persona
 											where id_persona = $2
 											and tipo_canal_digital = $3)
 		and refresh_token = $4`
@@ -619,10 +619,10 @@ func (v SecurityRepository) CheckLastAccessToken(ctx context.Context, token stri
 
 	var idToken int
 
-	query := `SELECT id_token FROM TS_SEC.token
+	query := `SELECT id_token FROM hysteria.token
 		WHERE api_key = $1 
 		AND id_canal_digital_persona = (select id_canal_digital_persona 
-											from ts_sec.canal_digital_persona
+											from hysteria.canal_digital_persona
 											where id_persona = $2
 											and tipo_canal_digital = $3)
 		and access_token = $4`
@@ -641,7 +641,7 @@ func (v SecurityRepository) GetAccessTokenDuration(ctx context.Context, apiKey s
 
 	var ctdHoras int
 
-	query := `SELECT ctd_hs_access_token_valido FROM TS_SEC.api_key
+	query := `SELECT ctd_hs_access_token_valido FROM hysteria.api_key
 		WHERE api_key = $1`
 
 	err := v.dbPost.GetDB().QueryRowContext(ctx, query, apiKey).Scan(&ctdHoras)
@@ -677,7 +677,7 @@ func (v SecurityRepository) Login2FA(ctx context.Context, login domains.RequestL
 		return 0, 0, err
 	}
 
-	query := `select id_persona from ts_sec.canal_digital_persona where login_name = $1`
+	query := `select id_persona from hysteria.canal_digital_persona where login_name = $1`
 
 	err = tx.QueryRowContext(ctx, query, login.Username).Scan(&idPersona)
 
@@ -685,8 +685,8 @@ func (v SecurityRepository) Login2FA(ctx context.Context, login domains.RequestL
 		return 0, ctdMins, err
 	}
 
-	query = `SELECT "2fa_seed" from ts_sec.token where api_key = $1
-		and id_canal_digital_persona = (select id_canal_digital_persona from ts_sec.canal_digital_persona where login_name = $2)`
+	query = `SELECT "2fa_seed" from hysteria.token where api_key = $1
+		and id_canal_digital_persona = (select id_canal_digital_persona from hysteria.canal_digital_persona where login_name = $2)`
 
 	err = tx.QueryRowContext(ctx, query, login.ApiKey, login.Username).Scan(&seed2FA)
 
@@ -750,7 +750,7 @@ func (v SecurityRepository) CheckAPI2FA(ctx context.Context, idPersona int, apiK
 		}
 	}()
 
-	query := `SELECT req_2fa from ts_sec.api_key where api_key = $1 `
+	query := `SELECT req_2fa from hysteria.api_key where api_key = $1 `
 
 	err = tx.QueryRowContext(ctx, query, apiKey).Scan(&reqApiKey)
 
@@ -758,7 +758,7 @@ func (v SecurityRepository) CheckAPI2FA(ctx context.Context, idPersona int, apiK
 		return nil, err
 	}
 
-	query = `SELECT req_2fa,login_name from ts_sec.canal_digital_persona where id_persona = $1 and tipo_canal_digital = $2 `
+	query = `SELECT req_2fa,login_name from hysteria.canal_digital_persona where id_persona = $1 and tipo_canal_digital = $2 `
 
 	err = tx.QueryRowContext(ctx, query, idPersona, canalDigital).Scan(&reqUser, &username)
 
@@ -770,8 +770,8 @@ func (v SecurityRepository) CheckAPI2FA(ctx context.Context, idPersona int, apiK
 		return nil, nil
 	}
 
-	query = `SELECT coalesce("2fa_seed",'NO TIENE') from ts_sec.token where api_key = $1 and id_canal_digital_persona =
-		(select id_canal_digital_persona from ts_sec.canal_digital_persona where id_persona = $2 and tipo_canal_digital = $3)`
+	query = `SELECT coalesce("2fa_seed",'NO TIENE') from hysteria.token where api_key = $1 and id_canal_digital_persona =
+		(select id_canal_digital_persona from hysteria.canal_digital_persona where id_persona = $2 and tipo_canal_digital = $3)`
 
 	err = tx.QueryRowContext(ctx, query, apiKey, idPersona, canalDigital).Scan(&seed2FAString)
 
@@ -790,8 +790,8 @@ func (v SecurityRepository) CheckAPI2FA(ctx context.Context, idPersona int, apiK
 			return nil, err
 		}
 
-		update := `update ts_sec.token set "2fa_seed" = $1 where api_key = $1 and id_canal_digital_persona =
-		(select id_canal_digital_persona from ts_sec.canal_digital_persona where id_persona = $2 and tipo_canal_digital = $3)`
+		update := `update hysteria.token set "2fa_seed" = $1 where api_key = $1 and id_canal_digital_persona =
+		(select id_canal_digital_persona from hysteria.canal_digital_persona where id_persona = $2 and tipo_canal_digital = $3)`
 
 		_, err = tx.ExecContext(ctx, update, seed2FA.Secret(), idPersona, canalDigital)
 
@@ -820,7 +820,7 @@ func (v SecurityRepository) RecuperacionPassword(ctx context.Context, recuperaci
 
 func (v SecurityRepository) ValidarCanalDigital(ctx context.Context, validarCanalDigital domains.ValidarCanalDigital) error {
 
-	update := `update ts_sec.canal_digital_persona set canal_validado = 'S' where id_persona = $1 and tipo_canal_digital = $2`
+	update := `update hysteria.canal_digital_persona set canal_validado = 'S' where id_persona = $1 and tipo_canal_digital = $2`
 
 	_, err := v.dbPost.GetDB().ExecContext(ctx, update, validarCanalDigital.IdPersona, validarCanalDigital.CanalDigital)
 
@@ -834,7 +834,7 @@ func (v SecurityRepository) ValidarCanalDigital(ctx context.Context, validarCana
 func (v SecurityRepository) checkSuperUser(ctx context.Context, apiKey string) (error, bool) {
 	var isSuperUser string
 
-	query := `select is_super_user from ts_sec.api_key where api_key = $1`
+	query := `select is_super_user from hysteria.api_key where api_key = $1`
 
 	err := v.dbPost.GetDB().QueryRowContext(ctx, query, apiKey).Scan(&isSuperUser)
 
@@ -861,7 +861,7 @@ func (v SecurityRepository) CrearCanalDigital(ctx context.Context, crearCanalDig
 		return fmt.Errorf("no posee los permisos necesarios para esta operacion")
 	}
 
-	insert := `insert into ts_sec.tipo_canal_digital_df (tipo_canal_digital) values ($1)`
+	insert := `insert into hysteria.tipo_canal_digital_df (tipo_canal_digital) values ($1)`
 
 	_, err = v.dbPost.GetDB().ExecContext(ctx, insert, crearCanalDigital.CanalDigital)
 
@@ -891,7 +891,7 @@ func (v SecurityRepository) CambioPassword(ctx context.Context, cambioPassword d
 		}
 	}()
 
-	query := `select password_acceso_hash from ts_sec.canal_digital_persona where id_persona = $1
+	query := `select password_acceso_hash from hysteria.canal_digital_persona where id_persona = $1
 		and tipo_canal_digital = $2`
 
 	err = tx.QueryRowContext(ctx, query, cambioPassword.IdPersona, cambioPassword.CanalDigital).Scan(&hashedActualPassword)
@@ -910,7 +910,7 @@ func (v SecurityRepository) CambioPassword(ctx context.Context, cambioPassword d
 		return err
 	}
 
-	update := `update ts_sec.canal_digital_persona set password_acceso_hash = $1 where id_persona = $2 and tipo_canal_digital = $3`
+	update := `update hysteria.canal_digital_persona set password_acceso_hash = $1 where id_persona = $2 and tipo_canal_digital = $3`
 
 	_, err = tx.ExecContext(ctx, update, hashedPassword, cambioPassword.IdPersona, cambioPassword.CanalDigital)
 
@@ -963,7 +963,7 @@ func (v SecurityRepository) CambioPasswordByLogin(ctx context.Context, loginName
 		return err
 	}
 
-	update := `update ts_sec.canal_digital_persona set password_acceso_hash = $1 where login_name = $2`
+	update := `update hysteria.canal_digital_persona set password_acceso_hash = $1 where login_name = $2`
 
 	_, err = tx.ExecContext(ctx, update, hashedPassword, loginName)
 
@@ -983,7 +983,7 @@ func (v SecurityRepository) GetEmailByID(ctx context.Context, loginName string) 
 	var mailPersona string
 	var idMailPersona int
 
-	query := `SELECT id_mail_persona FROM ts_sec.canal_digital_persona
+	query := `SELECT id_mail_persona FROM hysteria.canal_digital_persona
 		WHERE login_name = $1`
 
 	err := v.dbPost.GetDB().QueryRowContext(ctx, query, loginName).Scan(&idMailPersona)
@@ -1005,7 +1005,7 @@ func (v SecurityRepository) GetEmailByID(ctx context.Context, loginName string) 
 
 func (v SecurityRepository) ActivarUser2FA(ctx context.Context, activarUser2FA domains.ActivarUser2FA, idPersona int, canalDigital string) error {
 
-	update := `update ts_sec.canal_digital_persona set req_2fa = $1 where id_persona = $2 and tipo_canal_digital = $3`
+	update := `update hysteria.canal_digital_persona set req_2fa = $1 where id_persona = $2 and tipo_canal_digital = $3`
 
 	_, err := v.dbPost.GetDB().ExecContext(ctx, update, activarUser2FA.Activo, idPersona, canalDigital)
 
@@ -1020,7 +1020,7 @@ func (v SecurityRepository) CheckApiKeyExpirada(ctx context.Context, apiKey stri
 	var fecha time.Time
 	var apiKeyRevocada string
 
-	query := `SELECT fecha_fin_vigencia FROM ts_sec.api_key WHERE api_key = $1`
+	query := `SELECT fecha_fin_vigencia FROM hysteria.api_key WHERE api_key = $1`
 
 	err := v.dbPost.GetDB().QueryRowContext(ctx, query, apiKey).Scan(&fecha)
 
@@ -1032,7 +1032,7 @@ func (v SecurityRepository) CheckApiKeyExpirada(ctx context.Context, apiKey stri
 		return true, nil
 	}
 
-	query = `SELECT estado FROM ts_sec.api_key WHERE api_key = $1`
+	query = `SELECT estado FROM hysteria.api_key WHERE api_key = $1`
 
 	err = v.dbPost.GetDB().QueryRowContext(ctx, query, apiKey).Scan(&apiKeyRevocada)
 
@@ -1089,7 +1089,7 @@ func (v SecurityRepository) Generate2FAQR(ctx context.Context, generate2FAQR dom
 
 		canalDigital, _ = claims["canal_digital"].(string)
 
-		query := `SELECT id_canal_digital_persona FROM ts_sec.canal_digital_persona WHERE id_persona = $1
+		query := `SELECT id_canal_digital_persona FROM hysteria.canal_digital_persona WHERE id_persona = $1
 			and tipo_canal_digital = $2`
 
 		err = tx.QueryRowContext(ctx, query, idPersona, canalDigital).Scan(&idCanalDigitalPersona)
@@ -1100,7 +1100,7 @@ func (v SecurityRepository) Generate2FAQR(ctx context.Context, generate2FAQR dom
 	}
 
 	if idPersona == 0 && canalDigital == "" {
-		query := `SELECT id_canal_digital_persona FROM ts_sec.canal_digital_persona WHERE login_name = $1`
+		query := `SELECT id_canal_digital_persona FROM hysteria.canal_digital_persona WHERE login_name = $1`
 
 		err := tx.QueryRowContext(ctx, query, generate2FAQR.Username).Scan(&idCanalDigitalPersona)
 
@@ -1109,7 +1109,7 @@ func (v SecurityRepository) Generate2FAQR(ctx context.Context, generate2FAQR dom
 		}
 	}
 
-	query := `SELECT COALESCE("2fa_seed", 'NO TIENE') FROM ts_sec.token WHERE api_key = $1 and id_canal_digital_persona = $2`
+	query := `SELECT COALESCE("2fa_seed", 'NO TIENE') FROM hysteria.token WHERE api_key = $1 and id_canal_digital_persona = $2`
 
 	err = tx.QueryRowContext(ctx, query, generate2FAQR.ApiKey, idCanalDigitalPersona).Scan(&seed2FAString)
 
@@ -1128,7 +1128,7 @@ func (v SecurityRepository) Generate2FAQR(ctx context.Context, generate2FAQR dom
 			return "", err
 		}
 
-		update := `update ts_sec.token set "2fa_seed" = $1 where api_key = $2 and id_canal_digital_persona = $3`
+		update := `update hysteria.token set "2fa_seed" = $1 where api_key = $2 and id_canal_digital_persona = $3`
 
 		_, err = tx.ExecContext(ctx, update, seed2FA.Secret(), generate2FAQR.ApiKey, idCanalDigitalPersona)
 
