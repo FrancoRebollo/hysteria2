@@ -18,6 +18,19 @@ func NewSecurityRepository(dbOracl *oracle.OracleDB, dbPost *postgres.PostgresDB
 		dbOracl: dbOracl,
 		dbPost:  dbPost,
 	}
+
+}
+
+type HysteriaRepository struct {
+	dbOracl *oracle.OracleDB
+	dbPost  *postgres.PostgresDB
+}
+
+func NewHysteriaRepository(dbOracl *oracle.OracleDB, dbPost *postgres.PostgresDB) *HysteriaRepository {
+	return &HysteriaRepository{
+		dbOracl: dbOracl,
+		dbPost:  dbPost,
+	}
 }
 
 func (v SecurityRepository) GetVersion(ctx context.Context) (string, error) {

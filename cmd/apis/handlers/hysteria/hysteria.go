@@ -16,7 +16,7 @@ type HysteriaHandler struct {
 	*logrus.Logger
 }
 
-func NewHysteriaHandler(service ports.SecurityService, loggerInstance *logrus.Logger) *HysteriaHandler {
+func NewHysteriaHandler(service ports.HysteriaService, loggerInstance *logrus.Logger) *HysteriaHandler {
 	if loggerInstance == nil {
 		log.Fatal("es necesaria una instancia de logueo para que la app incie")
 	}

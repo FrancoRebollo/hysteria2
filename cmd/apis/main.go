@@ -98,8 +98,8 @@ func main() {
 		log.Fatalf("error creando instancia de logueo")
 	}
 
-	hysteriaRepository := repository.NewSecurityRepository(dbOracle, dbPostgres)
-	hysteriaService := services.NewSecurityService(hysteriaRepository, *config.App)
+	hysteriaRepository := repository.NewHysteriaRepository(dbOracle, dbPostgres)
+	hysteriaService := services.NewHysteriaService(hysteriaRepository, *config.App)
 	hysteriaHandler := hysteria.NewHysteriaHandler(hysteriaService, loggerHTTPInstance)
 
 	securityRepository := repository.NewSecurityRepository(dbOracle, dbPostgres)

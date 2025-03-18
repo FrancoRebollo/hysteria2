@@ -21,6 +21,20 @@ func NewSecurityService(repo ports.SecurityRepository, app config.App) *Security
 	}
 }
 
+type HysteriaService struct {
+	ports.HysteriaRepository
+	config.App
+}
+
+//Constructor de la estructura VersionService
+
+func NewHysteriaService(repo ports.HysteriaRepository, app config.App) *HysteriaService {
+	return &HysteriaService{
+		HysteriaRepository: repo,
+		App:                app,
+	}
+}
+
 func (s *SecurityService) GetVersionAPI(ctx context.Context) (*domains.Version, error) {
 
 	version_api, err := s.SecurityRepository.GetVersion(ctx)
