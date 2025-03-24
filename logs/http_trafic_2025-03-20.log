@@ -1,0 +1,4 @@
+{"level":"info","msg":"Logger HTTP inicializado correctamente","time":"2025-03-20T02:17:12-03:00"}
+{"Body":{"fecha":"2025-03-20T12:00:00Z","texto":"boss1 --- anuncio test 1"},"Endpoint":"/api/hysteria/altaAnuncio","RequestIP":"127.0.0.1","level":"info","msg":"Request received","time":"2025-03-20T02:19:43-03:00"}
+{"Body":{"fecha":"2025-03-20T12:00:00Z","texto":"boss1 --- anuncio test 1"},"Endpoint":"/api/hysteria/altaAnuncio","RequestIP":"127.0.0.1","level":"info","msg":"Request received","time":"2025-03-20T02:22:11-03:00"}
+{"Body":{"fecha":"2025-03-20T12:00:00Z","texto":"boss2 --- anuncio test 2"},"Endpoint":"/api/hysteria/altaAnuncio","RequestIP":"127.0.0.1","level":"info","msg":"Request received","time":"2025-03-20T02:22:20-03:00"}

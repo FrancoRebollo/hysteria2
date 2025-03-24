@@ -58,9 +58,12 @@ type SecurityRepository interface {
 }
 
 type HysteriaService interface {
-	AltaBossAPI(ctx context.Context, AltaBoss domains.RequestAltaBoss) error
+	AltaBossAPI(ctx context.Context, AltaBoss domains.RequestAltaBoss) (*domains.AltaBossResponse, error)
+	AltaAnuncioAPI(ctx context.Context, AltaBoss domains.RequestAltaAnuncio) (*domains.AltaAnuncioResponse, error)
 }
 
 type HysteriaRepository interface {
 	AltaBoss(ctx context.Context, AltaBoss domains.RequestAltaBoss) (string, error)
+	AltaAnuncio(ctx context.Context, AltaBoss domains.RequestAltaAnuncio) (string, error)
+	//AltaUserAPI(ctx context.Context, altaUser domains.RequestAltaUser) (*domains.AltaUserResponse, error)
 }

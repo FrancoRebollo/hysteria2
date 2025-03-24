@@ -1,0 +1,2 @@
+{"level":"info","msg":"Logger HTTP inicializado correctamente","time":"2025-03-17T23:58:38-03:00"}
+{"Body":{"domingo":"domingo","interval_respawn_time":"123","jueves":"jueves","lunes":"lunes","martes":"martes","miercoles":"miercoles","nombre":"falopa","respawn_time":123,"sabado":"sabado a la noche","unidad_interval_respawn_time":"minutes","viernes":"viernes"},"Endpoint":"/api/hysteria/altaBoss","RequestIP":"127.0.0.1","level":"info","msg":"Request received","time":"2025-03-17T23:59:11-03:00"}

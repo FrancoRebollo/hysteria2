@@ -1,5 +1,9 @@
 package domains
 
+import (
+	"time"
+)
+
 type CredentialsExtended struct {
 	IdPersona    int
 	ApiKey       string
@@ -83,8 +87,17 @@ type QRBase64UrlResponse struct {
 	ManualSeed string `json:"manual_seed"`
 }
 
+// ----------------------------------------------//
+
 type AltaBossResponse struct {
-	IdBosses int    `json:"id_bosses"`
-	Nombre   string `json:"nombre"`
-	Message  string `json:"message"`
+	//IdBosses int    `json:"id_bosses"`
+	Nombre  string `json:"nombre"`
+	Message string `json:"message"`
+}
+
+type AltaAnuncioResponse struct {
+	Id    int       `json:"id"`
+	Texto string    `json:"texto"`
+	Fecha time.Time `json:"fecha"`
+	Error string    `json:"error"`
 }

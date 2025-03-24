@@ -22,10 +22,10 @@ func (v HysteriaRepository) AltaBoss(ctx context.Context, AltaBoss domains.Reque
 		}
 	}()
 
-	//verifico si existe ya el boss con ese ID en la BD
-	query := `SELECT id_bosses FROM hysteria.bosses WHERE id_bosses = $1`
+	//verifico si existe ya el boss con ese nombre en la BD
+	query := `SELECT nombre FROM hysteria.bosses WHERE nombre = $1`
 
-	rows, err := tx.QueryContext(ctx, query, fmt.Sprint(AltaBoss.IdBosses))
+	rows, err := tx.QueryContext(ctx, query, fmt.Sprint(AltaBoss.Nombre))
 
 	if err != nil {
 		return "", err
@@ -34,9 +34,9 @@ func (v HysteriaRepository) AltaBoss(ctx context.Context, AltaBoss domains.Reque
 
 	if !rows.Next() {
 		//si no existe, inserto.
-		insert := "INSERT INTO hysteria.bosses (id_bosses) VALUES ($1)"
+		insert := "INSERT INTO hysteria.bosses (nombre) VALUES ($1)"
 
-		_, err = tx.ExecContext(ctx, insert, fmt.Sprint(AltaBoss.IdBosses))
+		_, err = tx.ExecContext(ctx, insert, fmt.Sprint(AltaBoss.Nombre))
 
 		if err != nil {
 			return "", err
@@ -47,20 +47,35 @@ func (v HysteriaRepository) AltaBoss(ctx context.Context, AltaBoss domains.Reque
 
 	rows.Close()
 
-	query = `SELECT id_bosses FROM hysteria.bosses WHERE id_bosses = $1`
+	// query = `SELECT nombre FROM hysteria.bosses WHERE nombre = $1`
 
-	rows, err = tx.QueryContext(ctx, query, fmt.Sprint(AltaBoss.IdBosses))
+	// rows, err = tx.QueryContext(ctx, query, fmt.Sprint(AltaBoss.Nombre))
 
-	if err != nil {
-		return "", err
-	}
+	// if err != nil {
+	// 	return "", err
+	// }
+
 	//inserto el resto de los datos
-	insert := `INSERT INTO hysteria.bosses
-		(nombre,respawn_time,interval_respawn_time,unidad_interval_respawn_time,
-		lunes,martes,miercoles,jueves,viernes,sabado,domingo)
-	 	VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`
+	insert := `UPDATE hysteria.bosses
+	SET 
+		respawn_time = $2,
+		interval_respawn_time = $3,
+		unidad_interval_respawn_time = $4,
+		lunes = $5,
+		martes = $6,
+		miercoles = $7,
+		jueves = $8,
+		viernes = $9,
+		sabado = $10,
+		domingo = $11
+	WHERE nombre = $1`
 
-	_, err = tx.ExecContext(ctx, insert, AltaBoss.IdBosses,
+	// `INSERT INTO hysteria.bosses
+	// 	(nombre,respawn_time,interval_respawn_time,unidad_interval_respawn_time,
+	// 	lunes,martes,miercoles,jueves,viernes,sabado,domingo)
+	//  	VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)` //$12 <== saco para manejo de id?
+
+	_, err = tx.ExecContext(ctx, insert, //AltaBoss.IdBosses,
 		AltaBoss.Nombre,
 		AltaBoss.RespawnTime,
 		AltaBoss.IntervalRespawnTime,
@@ -78,6 +93,44 @@ func (v HysteriaRepository) AltaBoss(ctx context.Context, AltaBoss domains.Reque
 	}
 
 	//commit
+	if err = tx.Commit(); err != nil {
+		return "", err
+	}
+
+	return message, nil
+}
+
+func (v HysteriaRepository) AltaAnuncio(ctx context.Context, AltaAnuncio domains.RequestAltaAnuncio) (string, error) {
+	var message string
+
+	// Iniciar transacción
+	tx, err := v.dbPost.GetDB().BeginTx(ctx, nil)
+	if err != nil {
+		return "", err
+	}
+
+	// Rollback en caso de error
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Comenzar la inserción del nuevo anuncio
+	insert := `INSERT INTO hysteria.anuncios (texto, fecha) 
+               VALUES ($1, $2) RETURNING id`
+
+	// Ejecutar la inserción
+	var id int
+	err = tx.QueryRowContext(ctx, insert, AltaAnuncio.Texto, AltaAnuncio.Fecha).Scan(&id)
+	if err != nil {
+		return "", err
+	}
+
+	// Mensaje de éxito
+	message = fmt.Sprintf("Anuncio creado exitosamente con ID: %d", id)
+
+	// Confirmar la transacción
 	if err = tx.Commit(); err != nil {
 		return "", err
 	}

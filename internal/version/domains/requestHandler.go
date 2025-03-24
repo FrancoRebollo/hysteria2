@@ -1,5 +1,9 @@
 package domains
 
+import (
+	"time"
+)
+
 type RequestUser struct {
 	ApiKey    string `json:"api_key"`
 	TipoCanal string `json:"tipo_canal"`
@@ -114,10 +118,9 @@ type Generate2FAQRDos struct {
 // ----------------------------------------------- //
 
 type RequestAltaBoss struct {
-	IdBosses    int    `json:"id_bosses"`
-	Nombre      string `json:"nombre"`
-	RespawnTime int    `json:"respawn_time"`
-
+	//IdBosses                  int    `json:"id_bosses"`
+	Nombre                    string `json:"nombre"`
+	RespawnTime               int    `json:"respawn_time"`
 	IntervalRespawnTime       int    `json:"interval_respawn_time"`
 	UnidadIntervalRespawnTime string `json:"unidad_interval_respawn_time"`
 	Lunes                     string `json:"lunes"`
@@ -127,4 +130,9 @@ type RequestAltaBoss struct {
 	Viernes                   string `json:"viernes"`
 	Sabado                    string `json:"sabado"`
 	Domingo                   string `json:"domingo"`
+}
+
+type RequestAltaAnuncio struct {
+	Texto string    `json:"texto"`
+	Fecha time.Time `json:"fecha"`
 }

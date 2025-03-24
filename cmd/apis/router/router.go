@@ -79,6 +79,7 @@ func NewRouter(config *config.HTTP, securityHandler seguridad.SecurityHandler, h
 		hysteria := api.Group("/hysteria")
 		{
 			hysteria.POST("/altaBoss", hysteriaHandler.AltaBoss)
+			hysteria.POST("/altaAnuncio", hysteriaHandler.AltaAnuncio)
 		}
 
 	}

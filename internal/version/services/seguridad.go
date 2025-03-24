@@ -13,6 +13,8 @@ import (
 
 func (s *SecurityService) AltaUserAPI(ctx context.Context, altaUser domains.RequestAltaUser) (*domains.AltaUserResponse, error) {
 
+	// valido con web service externo
+
 	message, err := s.SecurityRepository.AltaUser(ctx, altaUser)
 
 	if err != nil {

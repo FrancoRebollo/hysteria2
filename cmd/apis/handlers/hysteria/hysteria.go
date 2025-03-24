@@ -24,13 +24,45 @@ func NewHysteriaHandler(service ports.HysteriaService, loggerInstance *logrus.Lo
 }
 
 func (h *HysteriaHandler) AltaBoss(c *gin.Context) {
-	var version_api domains.Version
+	var request domains.RequestAltaBoss
 
 	if err := utils.LoggerHTTP(c); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Logger no disponible"})
 	}
 
-	version_api.NombreApi = "Hysteria"
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	c.JSON(200, version_api)
+	contenedor, err := h.AltaBossAPI(c, request) //<= invoco servicio
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, contenedor)
+}
+
+func (h *HysteriaHandler) AltaAnuncio(c *gin.Context) {
+	var request domains.RequestAltaAnuncio
+
+	if err := utils.LoggerHTTP(c); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Logger no disponible"})
+	}
+
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	contenedor, err := h.AltaAnuncioAPI(c, request) //<= invoco servicio
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, contenedor)
 }
